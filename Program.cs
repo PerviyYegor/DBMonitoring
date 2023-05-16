@@ -10,7 +10,6 @@ class Program
     static void Main()
     {
         ConnectWithConfigFile("./credentials/admin.txt");
-
         Application.Init();
         var mf = new MainForm();
         Application.Run();

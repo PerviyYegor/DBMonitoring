@@ -1,9 +1,3 @@
-using System.Data;
-using System.Runtime.CompilerServices;
-using System.ComponentModel;
-using System;
-using System.Xml.Linq;
-using System.Linq;
 using Gtk;
 
 public partial class MainForm : Gtk.Window
@@ -22,8 +16,10 @@ public partial class MainForm : Gtk.Window
 
         if (Program.connection.GetTableNames().Length != 0)
         {
-            foreach (var t in Program.connection.GetTableNames())
+            foreach (var t in Program.connection.GetTableNames()){
+                if(!Program.connection.isTableView(t))
                 tableNameBox.AppendText(t);
+            }
 
             tableNameBox.Active = 0;
 

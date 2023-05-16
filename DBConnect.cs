@@ -2,7 +2,7 @@
 using System.Data;
 using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
-
+using System;
 
 public class SMTH
 {
@@ -149,6 +149,21 @@ public class DBConnect
         return columns.ToArray();
     }
 
+    public string[] GetColumnTypes(string tableName)
+    {
+        var columns = new List<string>();
+
+        using (var cmd = new MySqlCommand($"SHOW COLUMNS FROM {tableName}", connection))
+        using (var reader = cmd.ExecuteReader())
+        {
+            while (reader.Read())
+                columns.Add(reader.GetString(1));
+            reader.Close();
+        }
+
+        return columns.ToArray();
+    }
+
 
 
     public string GetPrimaryKeyColName(string tableName)
@@ -166,6 +181,7 @@ public class DBConnect
     public string[][] GetRowsOfTable(string tableName)
     {
         var rows = new List<string[]>();
+        var colTypes = GetColumnTypes(tableName);
 
         using (var cmd = new MySqlCommand($"SELECT * FROM {tableName}", connection))
         using (var reader = cmd.ExecuteReader())
@@ -176,7 +192,10 @@ public class DBConnect
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     if (!reader.IsDBNull(i))
-                        row[i] = reader.GetString(i);
+                        if (colTypes[i] == "datetime") { row[i] = string.Concat(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()[..10]), reader.GetMySqlDateTime(i).ToString().AsSpan(10,9)); }
+                        else if (colTypes[i] == "date") { row[i] = ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()); }
+                        else
+                            row[i] = reader.GetString(i);
                     else
                         row[i] = null;
                 }
@@ -208,7 +227,8 @@ public class DBConnect
 
     public string[] GetRow(string tableName, string columnName, string value)
     {
-        var rows = new List<string>();
+        var row = new List<string>();
+        var colTypes = GetColumnTypes(tableName);
 
         using (var cmd = new MySqlCommand($"SELECT * FROM `{tableName}` WHERE `{columnName}`=@Value;", connection))
         {
@@ -220,14 +240,18 @@ public class DBConnect
                 {
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        rows.Add(reader.GetString(i)); // Додаємо значення кожної колонки в рядок
+                        if (colTypes[i] == "datetime") { row.Add(string.Concat(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()[..10]), reader.GetMySqlDateTime(i).ToString().AsSpan(10,9)));
+                         }
+                        else if (colTypes[i] == "date") { row.Add(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString())); }
+                        else
+                            row.Add(reader.GetString(i)); // Додаємо значення кожної колонки в рядок
                     }
                 }
                 reader.Close();
             }
         }
 
-        return rows.ToArray();
+        return row.ToArray();
     }
 
 
@@ -276,12 +300,34 @@ public class DBConnect
         }
     }
 
+    public bool isTableView(string tableName)
+    {
+        using (var cmd = new MySqlCommand($"SELECT table_type FROM information_schema.tables WHERE table_name = '{tableName}';", connection))
+        {
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    if (reader.GetString(0) == "VIEW") { reader.Close(); return true; }
+                }
+                reader.Close();
+                return false;
+            }
+        }
+    }
+
     static private string GetRightSqlValsString(object[] values)
     {
         return string.Join(", ", values.Select(val =>
         {
             return $"'{val}'"; // surround string with quotes
         }));
+    }
+
+    private static string ConvertDateFormat(string stringDate)
+    {
+        DateTime inputDate = DateTime.ParseExact(stringDate, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+        return inputDate.ToString("yyyy-MM-dd");
     }
 }
 
