@@ -192,7 +192,7 @@ public class DBConnect
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     if (!reader.IsDBNull(i))
-                        if (colTypes[i] == "datetime") { row[i] = string.Concat(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()[..10]), reader.GetMySqlDateTime(i).ToString().AsSpan(10,9)); }
+                        if (colTypes[i] == "datetime") { row[i] = string.Concat(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()[..10]), reader.GetMySqlDateTime(i).ToString().AsSpan(10, 9)); }
                         else if (colTypes[i] == "date") { row[i] = ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()); }
                         else
                             row[i] = reader.GetString(i);
@@ -240,8 +240,10 @@ public class DBConnect
                 {
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        if (colTypes[i] == "datetime") { row.Add(string.Concat(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()[..10]), reader.GetMySqlDateTime(i).ToString().AsSpan(10,9)));
-                         }
+                        if (colTypes[i] == "datetime")
+                        {
+                            row.Add(string.Concat(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString()[..10]), reader.GetMySqlDateTime(i).ToString().AsSpan(10, 9)));
+                        }
                         else if (colTypes[i] == "date") { row.Add(ConvertDateFormat(reader.GetMySqlDateTime(i).ToString())); }
                         else
                             row.Add(reader.GetString(i)); // Додаємо значення кожної колонки в рядок
@@ -257,7 +259,7 @@ public class DBConnect
 
 
     //Insert statement
-    public bool InsertRow(string tableName, string[] colNames, object[] values)
+    public bool InsertRow(string tableName, string[] colNames, string[] values)
     {
         try
         {
@@ -280,7 +282,7 @@ public class DBConnect
         }
     }
 
-    public bool UpdateRow(string tableName, string columnName, string value, string[] updateColNames, object[] updateValues)
+    public bool UpdateRow(string tableName, string columnName, string value, string[] updateColNames, string[] updateValues)
     {
         try
         {
@@ -296,6 +298,22 @@ public class DBConnect
         }
         catch (Exception)
         {
+            return false;
+        }
+    }
+
+    public bool UpdateRow(string tableName, string columnName, string value, string updateColName, string updateValue)
+    {
+        try
+        {
+            string query = $"UPDATE {tableName} SET {updateColName}='{updateValue}' WHERE {columnName}='{value}'";
+            var cmd = new MySqlCommand(query, connection);
+            cmd.ExecuteNonQuery();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
             return false;
         }
     }

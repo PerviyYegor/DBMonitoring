@@ -2,11 +2,11 @@ using Gtk;
 
 public partial class ShowRowForm : Gtk.Window
 {
-    public object[] Values { get; private set; }
+    public string[] Values { get; private set; }
 
     private readonly Builder builder = new();
     readonly Window win;
-    public ShowRowForm(string[] headers, object[] values) : base(Gtk.WindowType.Toplevel)
+    public ShowRowForm(string[] headers, string[] values) : base(Gtk.WindowType.Toplevel)
     {
         Values = values;
         builder.AddFromFile("./forms/Forms.glade");
@@ -42,7 +42,7 @@ public partial class ShowRowForm : Gtk.Window
 
         var saveB = (Button)builder.GetObject("SaveButton");
         var discardB = (Button)builder.GetObject("DiscardButton");
-        Values = new object[headers.Length];
+        Values = new string[headers.Length];
 
 
         saveB.Clicked += (sender, args) =>

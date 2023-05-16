@@ -25,7 +25,7 @@ public partial class MainForm : Gtk.Window
 
             win.Show();
         }
-        else Console.WriteLine("Your database is empty and there is no tables");
+        else {Console.WriteLine("Your database is empty and there is no tables"); Application.Quit();}
     }
 
     private void InitTriggers()

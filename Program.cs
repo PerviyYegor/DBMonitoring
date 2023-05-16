@@ -6,13 +6,20 @@ class Program
 {
 
     public static DBConnect connection;
+    public static string idEmployeeConnection;
 
     static void Main()
     {
-        ConnectWithConfigFile("./credentials/admin.txt");
+        ConnectWithConfigFile("./credentials/courier.txt");
         Application.Init();
-        var mf = new MainForm();
+        _ = new CourierForm();
         Application.Run();
+        
+        /* ConnectWithConfigFile("./credentials/admin.txt");
+        Application.Init();
+        var MF = new MainForm();
+        Application.Run(); */
+        
 
         connection.CloseConnection();
         Environment.Exit(0);
