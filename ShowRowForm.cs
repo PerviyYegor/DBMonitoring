@@ -47,7 +47,6 @@ public partial class ShowRowForm : Gtk.Window
 
         saveB.Clicked += (sender, args) =>
         {
-            foreach(var i in Values){ Console.WriteLine(i);}
             win.Hide();
             Application.Quit();
         };

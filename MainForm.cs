@@ -18,12 +18,18 @@ public partial class MainForm : Gtk.Window
 
         win = (Window)builder.GetObject("MainWindow");
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
-
-        foreach (var t in Program.connection.GetTableNames())
-            tableNameBox.AppendText(t);
-
-        win.Show();
         InitTriggers();
+
+        if (Program.connection.GetTableNames().Length != 0)
+        {
+            foreach (var t in Program.connection.GetTableNames())
+                tableNameBox.AppendText(t);
+
+            tableNameBox.Active = 0;
+
+            win.Show();
+        }
+        else Console.WriteLine("Your database is empty and there is no tables");
     }
 
     private void InitTriggers()
@@ -36,8 +42,10 @@ public partial class MainForm : Gtk.Window
 
         tableNameBox.Changed += tableNameText_changed_cb;
         table.RowActivated += OnRowActivated;
+        table.RowActivated += tableNameText_changed_cb;
         reloadB.Clicked += tableNameText_changed_cb;
         insertB.Clicked += OnInsertClicked;
+        insertB.Clicked += tableNameText_changed_cb;
         exitB.Clicked += OnExitClicked;
     }
 
@@ -46,16 +54,16 @@ public partial class MainForm : Gtk.Window
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
         Application.Init();
         var mf = new ShowRowForm(Program.connection.GetColumnNames(tableNameBox.ActiveText));
-          Application.Run();
-        if(mf.Values is null) return;
-        Program.connection.InsertRow(tableNameBox.ActiveText,Program.connection.GetColumnNames(tableNameBox.ActiveText),mf.Values);
+        Application.Run();
+        if (mf.Values is null) return;
+        if (Program.connection.InsertRow(tableNameBox.ActiveText, Program.connection.GetColumnNames(tableNameBox.ActiveText), mf.Values))
+            _ = new MessageBox("Insert successful!");
+        else _ = new MessageBox("Insert unsuccessful :("); ;
     }
 
     private void OnExitClicked(object sender, System.EventArgs args)
     {
-        this.Close();
-        Program.connection.CloseConnection();
-        Environment.Exit(0);
+        Application.Quit();
     }
 
     private void OnRowActivated(object sender, RowActivatedArgs args)
@@ -80,16 +88,19 @@ public partial class MainForm : Gtk.Window
                     Application.Run();
                     if (mf.Values == null) return;
 
-                    Program.connection.UpdateRow(tableNameBox.ActiveText, prKeyColumn, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyColumn)),
-                Program.connection.GetColumnNames(tableNameBox.ActiveText), mf.Values);
+                    if (Program.connection.UpdateRow(tableNameBox.ActiveText, prKeyColumn, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyColumn)),
+                Program.connection.GetColumnNames(tableNameBox.ActiveText), mf.Values))
+                        _ = new MessageBox("Update successful!");
+                    else _ = new MessageBox("Update unsuccessful :(");
                 }
                 break;
             case ("Delete"):
                 string prKey = Program.connection.GetPrimaryKeyColName(tableNameBox.ActiveText);
                 if (model.GetIter(out TreeIter iter2, path))
                 {
-                    Program.connection.DeleteRow(tableNameBox.ActiveText, prKey, (string)model.GetValue(iter2, GetColumnIndex(table, prKey)));
-                    Program.connection.OpenConnection();
+                    if (Program.connection.DeleteRow(tableNameBox.ActiveText, prKey, (string)model.GetValue(iter2, GetColumnIndex(table, prKey))))
+                        _ = new MessageBox("Delete successful!");
+                    else _ = new MessageBox("Delete unsuccessful :(");
                 }
                 break;
             case (null):

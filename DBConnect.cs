@@ -1,23 +1,82 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.Data;
 using MySql.Data.MySqlClient;
+using System.Text.RegularExpressions;
+
+
+public class SMTH
+{
+    public string Host { get; private set; }
+    public string DbName { get; private set; }
+    public string UserName { get; private set; }
+    public string Password { get; private set; }
+}
+
+public class ConnectionData
+{
+    public string Host { get; private set; }
+    public string DbName { get; private set; }
+    public string UserName { get; private set; }
+    public string Password { get; private set; }
+
+    public ConnectionData(string server_, string database_, string uid_, string password_)
+    {
+        Host = server_;
+        DbName = database_;
+        UserName = uid_;
+        Password = password_;
+    }
+
+    public ConnectionData(string pathToJsonFile)
+    {
+        var text = "";
+        using (var reader = new StreamReader(pathToJsonFile))
+            text = reader.ReadToEnd();
+
+        Regex regex = new Regex(@"(\w+):\s*(\S+)");
+        MatchCollection matches = regex.Matches(text);
+
+        foreach (Match match in matches)
+        {
+            string key = match.Groups[1].Value;
+            string value = match.Groups[2].Value;
+
+            switch (key)
+            {
+                case "Host":
+                    Host = value;
+                    break;
+                case "DbName":
+                    DbName = value;
+                    break;
+                case "UserName":
+                    UserName = value;
+                    break;
+                case "Password":
+                    Password = value;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
 
 public class DBConnect
 {
     private MySqlConnection connection;
-    private readonly string server;
-    private readonly string database;
-    private readonly string uid;
-    private readonly string password;
+    private readonly ConnectionData CD;
 
     //Constructor
     public DBConnect(string server_, string database_, string uid_, string password_)
     {
-        server = server_;
-        database = database_;
-        uid = uid_;
-        password = password_;
+        CD = new ConnectionData(server_, database_, uid_, password_);
+        Initialize();
+    }
+
+    public DBConnect(string pathToJsonFile)
+    {
+        CD = new ConnectionData(pathToJsonFile);
         Initialize();
     }
 
@@ -25,7 +84,7 @@ public class DBConnect
     private void Initialize()
     {
         string connectionString;
-        connectionString = $"Database={database};Server={server};Uid={uid};Pwd={password};charset=utf8mb4";
+        connectionString = $"Database={CD.DbName};Server={CD.Host};Uid={CD.UserName};Pwd={CD.Password};charset=utf8mb4";
 
         connection = new MySqlConnection(connectionString);
     }
@@ -36,13 +95,13 @@ public class DBConnect
         try
         {
             connection.Open();
-            return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             return false;
         }
+        return true;
     }
 
     //Close connection
@@ -66,8 +125,11 @@ public class DBConnect
 
         using (var cmd = new MySqlCommand("SHOW TABLES", connection))
         using (var reader = cmd.ExecuteReader())
+        {
             while (reader.Read())
                 tables.Add(reader.GetString(0));
+            reader.Close();
+        }
 
         return tables.ToArray();
     }
@@ -78,8 +140,11 @@ public class DBConnect
 
         using (var cmd = new MySqlCommand($"SHOW COLUMNS FROM {tableName}", connection))
         using (var reader = cmd.ExecuteReader())
+        {
             while (reader.Read())
                 columns.Add(reader.GetString(0));
+            reader.Close();
+        }
 
         return columns.ToArray();
     }
@@ -90,8 +155,11 @@ public class DBConnect
     {
         using (var cmd = new MySqlCommand($"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE CONSTRAINT_NAME = 'PRIMARY' AND TABLE_NAME = '{tableName}';", connection))
         using (var reader = cmd.ExecuteReader())
+        {
             while (reader.Read())
                 return reader.GetString(0);
+            reader.Close();
+        }
         return null;
     }
 
@@ -114,6 +182,7 @@ public class DBConnect
                 }
                 rows.Add(row);
             }
+            reader.Close();
         }
 
         return rows.ToArray();
@@ -129,7 +198,6 @@ public class DBConnect
             var cmd = new MySqlCommand(query, connection);
             cmd.Parameters.AddWithValue("@value", value);
             cmd.ExecuteNonQuery();
-            this.CloseConnection();
             return true;
         }
         catch (Exception)
@@ -155,6 +223,7 @@ public class DBConnect
                         rows.Add(reader.GetString(i)); // Додаємо значення кожної колонки в рядок
                     }
                 }
+                reader.Close();
             }
         }
 

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yxpLy8nYp9ny4nCABGlthyELiSL2H9VEMiQ277IVH2KESSq3xQrKudwHFhFHAsvcXUNMSgPdrMlFuTMMSr4KjA==",
+  "dgSpecHash": "GHoJ/njOjJzQar1xdNo75QGjU0d6Uc5h1P9Ss4wYhiVfFGP0WygFzLJdlSVRBQpDAhBNreNm72NhryqLL3py3w==",
   "success": true,
-  "projectFilePath": "/home/yeg/Dekstop/Course_4/DB/manufactureDB/manufactureDB.csproj",
+  "projectFilePath": "/home/yeg/Dekstop/Course_4/Course Project/DBMonitoring/manufactureDB.csproj",
   "expectedPackageFiles": [
     "/home/yeg/.nuget/packages/atksharp/3.24.24.95/atksharp.3.24.24.95.nupkg.sha512",
     "/home/yeg/.nuget/packages/cairosharp/3.24.24.95/cairosharp.3.24.24.95.nupkg.sha512",

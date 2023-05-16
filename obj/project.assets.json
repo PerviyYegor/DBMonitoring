@@ -1894,11 +1894,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/yeg/Dekstop/Course_4/DB/manufactureDB/manufactureDB.csproj",
+      "projectUniqueName": "/home/yeg/Dekstop/Course_4/Course Project/DBMonitoring/manufactureDB.csproj",
       "projectName": "manufactureDB",
-      "projectPath": "/home/yeg/Dekstop/Course_4/DB/manufactureDB/manufactureDB.csproj",
+      "projectPath": "/home/yeg/Dekstop/Course_4/Course Project/DBMonitoring/manufactureDB.csproj",
       "packagesPath": "/home/yeg/.nuget/packages/",
-      "outputPath": "/home/yeg/Dekstop/Course_4/DB/manufactureDB/obj/",
+      "outputPath": "/home/yeg/Dekstop/Course_4/Course Project/DBMonitoring/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/yeg/.nuget/NuGet/NuGet.Config"
