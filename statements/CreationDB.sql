@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS Couriers(
 CREATE TABLE IF NOT EXISTS Passwords(
     idPassOrder INT UNSIGNED NOT NULL AUTO_INCREMENT,
     idEmployee VARCHAR(7) NOT NULL UNIQUE,
-    login_ VARCHAR(45),
-    password_ VARCHAR(45),
+    login_ VARCHAR(45) UNIQUE,
+    password_ VARCHAR(45) UNIQUE,
     adminCheck TINYINT,
     PRIMARY KEY (idPassOrder),
     FOREIGN KEY fk_passEmployee(idEmployee) REFERENCES Employees(idEmployee)
@@ -54,3 +54,9 @@ CREATE TABLE IF NOT EXISTS Orders(
     INDEX (clientPhone),
     INDEX(deliveryActuality)
 );
+
+CREATE VIEW CourierView AS
+    SELECT
+    `idOrder`,`deliveryActuality`, `destinationCoord`, `deliveryCost`, `clientPhone`, `clientName`, `orderName`, `orderDescription`
+    FROM `Orders`
+    WHERE `deliveryActuality`=1;

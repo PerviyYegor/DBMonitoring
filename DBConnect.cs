@@ -287,27 +287,35 @@ public class DBConnect
         try
         {
             string updStr = "";
-            for (int i = 0; i < updateColNames.Length; i++)
-                updStr += updateColNames[i] + $"='{updateValues[i]}', ";
+            for (int i = 0; i < updateColNames.Length; i++){
+                var newValue = updateValues[i]==""?"@valueNull":updateValues[i]=$"'{updateValues[i]}'";
+                updStr += updateColNames[i] + $"={newValue}, ";
+                }
             updStr = updStr[..^2];
 
             string query = $"UPDATE {tableName} SET {updStr} WHERE {columnName}='{value}'";
             var cmd = new MySqlCommand(query, connection);
+            cmd.Parameters.AddWithValue("@valueNull", DBNull.Value);
             cmd.ExecuteNonQuery();
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return false;
         }
     }
 
     public bool UpdateRow(string tableName, string columnName, string value, string updateColName, string updateValue)
     {
+
         try
         {
-            string query = $"UPDATE {tableName} SET {updateColName}='{updateValue}' WHERE {columnName}='{value}'";
+            string query = $"UPDATE {tableName} SET {updateColName}= @value WHERE {columnName}='{value}'";
             var cmd = new MySqlCommand(query, connection);
+            if(updateValue==null|| updateValue=="")
+            cmd.Parameters.AddWithValue("@value", DBNull.Value);
+            else cmd.Parameters.AddWithValue("@value", updateValue);
             cmd.ExecuteNonQuery();
             return true;
         }
@@ -332,14 +340,6 @@ public class DBConnect
                 return false;
             }
         }
-    }
-
-    static private string GetRightSqlValsString(object[] values)
-    {
-        return string.Join(", ", values.Select(val =>
-        {
-            return $"'{val}'"; // surround string with quotes
-        }));
     }
 
     private static string ConvertDateFormat(string stringDate)

@@ -12,7 +12,7 @@ public partial class CourierForm : Gtk.Window
         builder.AddFromFile("./forms/Forms.glade");
 
         win = (Window)builder.GetObject("CourierWindow");
-        loadView("CourierView");
+        loadView(viewName);
 
         InitTriggers();
         win.Show();
@@ -36,10 +36,9 @@ public partial class CourierForm : Gtk.Window
     private void OnRowActivated(object sender, RowActivatedArgs args)
     {
         var table = (TreeView)builder.GetObject("tableTextC");
-        string prKeyName = Program.connection.GetColumnNames(viewName)[0];
+        string prKeyName = Program.connection.GetPrimaryKeyColName("Orders");
 
         TreePath path = args.Path;
-        int index = path.Indices[0];
 
         ITreeModel model = ((TreeView)sender).Model;
 
@@ -50,9 +49,26 @@ public partial class CourierForm : Gtk.Window
                 case "Yeah!":
                     Application.Init();
 
-                   if (Program.connection.UpdateRow(viewName, prKeyName, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyName)),
-                "DeliveryActuality", "0")) {
-                        _ = new MessageBox("Order is your!"); loadView(viewName);}
+                    if (Program.connection.UpdateRow("Orders", prKeyName, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyName)),
+                 new String[] { "DeliveryActuality", "idCourier" }, new String[] { "0", Program.connection.GetRow("Couriers", "idEmployee", Program.idEmployeeConnection)[0] }))
+                    {
+                        switch (AskUser("Order is your! When delivery will be ready just click necessary button below", "Cancel delivery", "Delivery done!"))
+                        {
+                            case "Cancel delivery":
+                                Program.connection.UpdateRow("Orders", prKeyName, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyName)),
+                     new String[] { "DeliveryActuality", "idCourier" }, new String[] { "1", "" });
+                                break;
+                            case "Delivery done!":
+                            Program.connection.UpdateRow("Orders", prKeyName, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyName)),
+                     "deliveryEnd", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                     
+
+                                break;
+                        }
+
+
+                        loadView(viewName);
+                    }
                     else _ = new MessageBox("Something went wrong :( \n Contact with your admin");
 
                     break;
@@ -60,6 +76,7 @@ public partial class CourierForm : Gtk.Window
                 default:
                     return;
             }
+            loadView(viewName);
     }
     protected void loadView(string viewName)
     {
