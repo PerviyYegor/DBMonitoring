@@ -20,13 +20,10 @@ CREATE TABLE IF NOT EXISTS Admins(
 CREATE TABLE IF NOT EXISTS Couriers(
     idCourier INT UNSIGNED NOT NULL AUTO_INCREMENT,
     idEmployee VARCHAR(7) NOT NULL,
-    #example: 50.042758532664884, 36.28471029653125
-    currentCoord VARCHAR(50),
     courierAdminId INT UNSIGNED NOT NULL,
     PRIMARY KEY(idCourier),
     FOREIGN KEY fk_courierEmployee(idEmployee) REFERENCES Employees(idEmployee),
-    FOREIGN KEY fk_couriersAdmin(courierAdminId) REFERENCES Admins(idAdmin),
-    INDEX(currentCoord)
+    FOREIGN KEY fk_couriersAdmin(courierAdminId) REFERENCES Admins(idAdmin)
 );
 
 CREATE TABLE IF NOT EXISTS Passwords(
@@ -49,13 +46,11 @@ CREATE TABLE IF NOT EXISTS Orders(
     deliveryCost DECIMAL(10, 2),
     clientPhone VARCHAR (45),
     clientName VARCHAR (45),
-    deliveryDistance DECIMAL(10, 2) DEFAULT NULL,
     deliveryActuality TINYINT DEFAULT '1',
     orderName VARCHAR(45) NOT NULL,
     orderDescription VARCHAR(500) DEFAULT NULL,
     PRIMARY KEY(idOrder),
     FOREIGN KEY fk_orderCourier(idCourier) REFERENCES Couriers(idCourier),
     INDEX (clientPhone),
-    INDEX(deliveryDistance),
     INDEX(deliveryActuality)
 );
