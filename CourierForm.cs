@@ -1,12 +1,13 @@
 using Gtk;
 
+//Клас форми, що відображає таблицю з короткою інформацію про замовлення, яку потрібно знати кур’єру
 public partial class CourierForm : Gtk.Window
 {
-    public string[] ColumnNames { get; private set; }
-
     private readonly Builder builder = new();
     private readonly string viewName = "CourierView";
     readonly Window win;
+
+    //Конструктор класу форми CourierForm
     public CourierForm() : base(Gtk.WindowType.Toplevel)
     {
         builder.AddFromFile("./forms/Forms.glade");
@@ -18,17 +19,18 @@ public partial class CourierForm : Gtk.Window
         win.Show();
     }
 
-
+    //Заповнює мітки на формі
     private void fillLabels()
     {
         var courierInfoLabel = (Label)builder.GetObject("courierInfoLabel");
         var adminInfoLabel = (Label)builder.GetObject("AdminOfCourierInfo");
         var courierRow = Program.connection.GetRow("Couriers", "idEmployee", Program.idEmployeeConnection);
-       
-        adminInfoLabel.Text = "Info about you:\n"+Program.connection.GetCourierInfo(courierRow[0]);
-        courierInfoLabel.Text = "Info about your admin:\n"+Program.connection.GetAdminInfo(courierRow[2]);
+
+        adminInfoLabel.Text = "Info about you:\n" + Program.connection.GetCourierInfo(courierRow[0]);
+        courierInfoLabel.Text = "Info about your admin:\n" + Program.connection.GetAdminInfo(courierRow[2]);
     }
 
+    //Ініціалізує обробники подій
     private void InitTriggers()
     {
         var table = (TreeView)builder.GetObject("tableTextC");
@@ -39,10 +41,13 @@ public partial class CourierForm : Gtk.Window
         exitB.Clicked += OnExitClicked;
     }
 
+    //Обробляє подію натискання кнопки виходу
     private void OnExitClicked(object sender, System.EventArgs args)
     {
         Application.Quit();
     }
+
+    //Обробляє подію активації рядка таблиці
     private void OnRowActivated(object sender, RowActivatedArgs args)
     {
         var table = (TreeView)builder.GetObject("tableTextC");
@@ -88,6 +93,8 @@ public partial class CourierForm : Gtk.Window
             }
         LoadView(viewName);
     }
+
+    //Завантажує вид таблиці у форму
     protected void LoadView(string viewName)
     {
         var table = (TreeView)builder.GetObject("tableTextC");
@@ -116,6 +123,8 @@ public partial class CourierForm : Gtk.Window
 
         table.Model = ts;
     }
+
+    //Генерація маленького діалового вікна, що запитує користувача щось і повертає одну з двух відповідей 
     static string AskUser(string question, string option1, string option2)
     {
         var dialog = new Gtk.MessageDialog(
@@ -138,6 +147,8 @@ public partial class CourierForm : Gtk.Window
             return option2;
         else return null;
     }
+
+    //Повертає індекс колонки за назвою
     static private int GetColumnIndex(TreeView table, string tittle)
     {
         for (int i = 0; i < table.Columns.Length; i++)

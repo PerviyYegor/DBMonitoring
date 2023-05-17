@@ -1,15 +1,13 @@
-using System.Runtime.InteropServices;
 using Gtk;
-using System.Data;
-using MySql.Data.MySqlClient;
 
+//Клас, що ініціалізує програму та викликає потрібні блоки
 class Program
 {
+    public static DBConnect connection; //поле, що містить посилання на поточне підключення до БД
+    public static string idEmployeeConnection; //ID аутентифікованого працівника
+    public static bool isUserAdmin;//поле, що містить інформацію чи аутентифікований працівник є адміністратором
 
-    public static DBConnect connection;
-    public static string idEmployeeConnection;
-    public static bool isUserAdmin;
-
+    //Метод, що ініціалізує програму та викликає потрібні блоки
     static void Main()
     {
         ConnectWithConfigFile("./credentials/DBConnectData.txt");
@@ -34,7 +32,7 @@ class Program
         connection.CloseConnection();
         Environment.Exit(0);
     }
-
+    //Блок, що здійснює аутентифікацію користувача
     static bool UserEnter()
     {
         Application.Init();
@@ -58,7 +56,7 @@ class Program
             return false;
         return true;
     }
-
+    //Блок, що здійснює підключення через окрему форму
     static DBConnect ConnectWithForm()
     {
         Application.Init();
@@ -82,7 +80,7 @@ class Program
         connection.OpenConnection();
         return connection;
     }
-
+    //Блок, що здійснює підключення через конфігураційний файл
     static DBConnect ConnectWithConfigFile(string pathToJsonFile)
     {
         Application.Init();

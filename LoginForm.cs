@@ -1,14 +1,15 @@
 using Gtk;
 
+//Клас, що описує форму, що аутентифікує користувача при його підключенні до застосунку
 public partial class LoginForm : Gtk.Dialog
 {
-
     private readonly Builder builder = new();
     readonly Window win;
 
-    public string login { get; private set; }
-    public string password { get; private set; }
+    public string login { get; private set; } //Логін працівника
+    public string password { get; private set; }//Пароль працівника
 
+    //Конструктор класу форми LoginForm
     public LoginForm() : base()
     {
         builder.AddFromFile("./forms/Forms.glade");
@@ -20,6 +21,7 @@ public partial class LoginForm : Gtk.Dialog
         win.Show();
     }
 
+    //Ініціювання тригерів натискань на кнопки
     private void InitTriggers()
     {
         var loginB = (Button)builder.GetObject("loginUserButton");
@@ -29,6 +31,7 @@ public partial class LoginForm : Gtk.Dialog
         cancelB.Clicked += OnCancelClicked;
     }
 
+    //Тригер натискання на кнопку аутентифікації працівника
     private void OnLoginClicked(object sender, System.EventArgs args)
     {
         var loginField = (Entry)builder.GetObject("loginText");
@@ -41,6 +44,7 @@ public partial class LoginForm : Gtk.Dialog
         Application.Quit();
     }
 
+    //Тригер натискання на кнопку відміни аутентифікації
     private void OnCancelClicked(object sender, System.EventArgs args)
     {
         win.Hide();

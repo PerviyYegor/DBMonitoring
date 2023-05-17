@@ -1,11 +1,14 @@
 using Gtk;
 
+//Клас форми, що відображає один рядок таблиці
 public partial class ShowRowForm : Gtk.Window
 {
-    public string[] Values { get; private set; }
+    public string[] Values { get; private set; }//Поле, що містить дані, що були введені під час дії вікна
 
     private readonly Builder builder = new();
     readonly Window win;
+    
+     //Конструктор класу ShowRowForm, що приймає назви колонок та значення одного рядка для цих колонок
     public ShowRowForm(string[] headers, string[] values) : base(Gtk.WindowType.Toplevel)
     {
         Values = values;
@@ -33,7 +36,7 @@ public partial class ShowRowForm : Gtk.Window
         DisplayTable(headers, values);
         win.Show();
     }
-
+    //Конструктор класу ShowRowForm, що приймає тільки назви колонок
     public ShowRowForm(string[] headers) : base(Gtk.WindowType.Toplevel)
     {
         builder.AddFromFile("./forms/Forms.glade");
@@ -61,9 +64,7 @@ public partial class ShowRowForm : Gtk.Window
         DisplayTable(headers, new object[headers.Length]);
         win.Show();
     }
-
-
-
+    //Відображення даного рядку в таблицю
     private void DisplayTable(string[] headers, object[] values)
     {
 

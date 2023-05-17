@@ -1,24 +1,18 @@
-﻿
-using System.Data;
+﻿using System.Data;
 using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
 using System;
 
-public class SMTH
-{
-    public string Host { get; private set; }
-    public string DbName { get; private set; }
-    public string UserName { get; private set; }
-    public string Password { get; private set; }
-}
 
+//Клас, що містить дані та методи для їх отримання задля підключення до БД
 public class ConnectionData
 {
-    public string Host { get; private set; }
-    public string DbName { get; private set; }
-    public string UserName { get; private set; }
-    public string Password { get; private set; }
+    public string Host { get; private set; }//адреса підключення до БД
+    public string DbName { get; private set; }//ім'я БД
+    public string UserName { get; private set; }//ім'я користувача до якого приєднується підключення до БД
+    public string Password { get; private set; }//пароль користувача до якого приєднується підключення до БД
 
+    //Конструктор класу ConnectionData, якому подаються всі поля для підключення
     public ConnectionData(string server_, string database_, string uid_, string password_)
     {
         Host = server_;
@@ -27,10 +21,11 @@ public class ConnectionData
         Password = password_;
     }
 
-    public ConnectionData(string pathToJsonFile)
+    //Конструктор класу ConnectionData, що бере дані з файлу за даним шляхом
+    public ConnectionData(string pathToTxtFile)
     {
         var text = "";
-        using (var reader = new StreamReader(pathToJsonFile))
+        using (var reader = new StreamReader(pathToTxtFile))
             text = reader.ReadToEnd();
 
         Regex regex = new Regex(@"(\w+):\s*(\S+)");
@@ -62,25 +57,30 @@ public class ConnectionData
     }
 }
 
+//Клас обгортка для взаємодії з базою даних
 public class DBConnect
 {
+    //Поле, що містить посилання на діюче підключення до БД
     private MySqlConnection connection;
+
+    //Поле, що містить дані про діюче підключення до БД
     private readonly ConnectionData CD;
 
-    //Constructor
+    //Конструктор класу DBConnect, якому подаються всі поля для підключення
     public DBConnect(string server_, string database_, string uid_, string password_)
     {
         CD = new ConnectionData(server_, database_, uid_, password_);
         Initialize();
     }
 
-    public DBConnect(string pathToJsonFile)
+    //Конструктор класу ConnectionData, що бере дані з файлу за даним шляхом
+    public DBConnect(string pathToTxtFile)
     {
-        CD = new ConnectionData(pathToJsonFile);
+        CD = new ConnectionData(pathToTxtFile);
         Initialize();
     }
 
-    //Initialize values
+    //Ініціалізація підключення до бази даних
     private void Initialize()
     {
         string connectionString;
@@ -89,7 +89,7 @@ public class DBConnect
         connection = new MySqlConnection(connectionString);
     }
 
-    //open connection to database
+    //Відкриття підключення до БД
     public bool OpenConnection()
     {
         try
@@ -104,7 +104,7 @@ public class DBConnect
         return true;
     }
 
-    //Close connection
+    //Закриття підключення до БД
     public bool CloseConnection()
     {
         try
@@ -119,6 +119,7 @@ public class DBConnect
         }
     }
 
+    //Отримання імен таблиць, що містяться в БД
     public string[] GetTableNames()
     {
         var tables = new List<string>();
@@ -134,6 +135,7 @@ public class DBConnect
         return tables.ToArray();
     }
 
+    //Отримання імен стовпців, що містяться в таблиці
     public string[] GetColumnNames(string tableName)
     {
         var columns = new List<string>();
@@ -149,6 +151,7 @@ public class DBConnect
         return columns.ToArray();
     }
 
+    //Отримання типів колонок в таблиці
     public string[] GetColumnTypes(string tableName)
     {
         var columns = new List<string>();
@@ -164,8 +167,7 @@ public class DBConnect
         return columns.ToArray();
     }
 
-
-
+    //Отримання імені колонки, що містить клочове значення
     public string GetPrimaryKeyColName(string tableName)
     {
         using (var cmd = new MySqlCommand($"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE CONSTRAINT_NAME = 'PRIMARY' AND TABLE_NAME = '{tableName}';", connection))
@@ -178,6 +180,7 @@ public class DBConnect
         return null;
     }
 
+    //Отримання всіх рядків, що містяться в таблиці
     public string[][] GetRowsOfTable(string tableName)
     {
         var rows = new List<string[]>();
@@ -207,8 +210,7 @@ public class DBConnect
         return rows.ToArray();
     }
 
-
-    //Delete statement
+    //Видалення рядка в таблиці по значенню в конкретному стовпці
     public bool DeleteRow(string tableName, string columnName, string value)
     {
         try
@@ -225,6 +227,7 @@ public class DBConnect
         }
     }
 
+    //Отримання одного рядку, що міститься в таблиці по значенню в конкретному стовпці
     public string[] GetRow(string tableName, string columnName, string value)
     {
         var row = new List<string>();
@@ -256,9 +259,7 @@ public class DBConnect
         return row.ToArray();
     }
 
-
-
-    //Insert statement
+    //Включення нового рядка
     public bool InsertRow(string tableName, string[] colNames, string[] values)
     {
         try
@@ -282,6 +283,7 @@ public class DBConnect
         }
     }
 
+    //Оновлення рядка в таблиці по значенню в конкретному стовпці, де подаються одразу декілька значень, що треба оновити
     public bool UpdateRow(string tableName, string columnName, string value, string[] updateColNames, string[] updateValues)
     {
         try
@@ -307,9 +309,9 @@ public class DBConnect
         }
     }
 
+    //Оновлення рядка в таблиці по значенню в конкретному стовпці, де подається одне значення, що треба оновити
     public bool UpdateRow(string tableName, string columnName, string value, string updateColName, string updateValue)
     {
-
         try
         {
             string query = $"UPDATE {tableName} SET {updateColName}= @value WHERE {columnName}='{value}'";
@@ -327,6 +329,7 @@ public class DBConnect
         }
     }
 
+    //Перевірка чи конкретна таблиця є переглядом
     public bool isTableView(string tableName)
     {
         using (var cmd = new MySqlCommand($"SELECT table_type FROM information_schema.tables WHERE table_name = '{tableName}';", connection))
@@ -343,25 +346,28 @@ public class DBConnect
         }
     }
 
+    //Отримання інформації про конкретного кур'єра за його ID кур'єра
     public string GetCourierInfo(string courierID)
     {
         var courierEmpID = Program.connection.GetRow("Couriers", "idCourier", courierID)[1];
         return $"Courier ID:{courierEmpID}\nCourier {GetEmployeeInfo(courierEmpID)}";
     }
 
+    //Отримання інформації про конкретного адміна за його ID адміна
     public string GetAdminInfo(string adminID)
     {
         var adminEmpID = Program.connection.GetRow("Admins", "idAdmin", adminID)[1];
         return $"Admin ID:{adminEmpID}\nAdmin {GetEmployeeInfo(adminEmpID)}";
     }
 
+    //Отримання інформації про конкретного співробітника за його ID співробітника
     public string GetEmployeeInfo(string employeeID)
     {
 
         var empInfoRow = GetRow("Employees", "idEmployee", employeeID);
         return $"Employee ID:{empInfoRow[0]}\n{empInfoRow[1]} {empInfoRow[2]}\nPhone:{empInfoRow[4]}";
     }
-
+    //Конвертація з типу, що дає mysqlconnector до типу, з яким працює mysql
     private static string ConvertDateFormat(string stringDate)
     {
         DateTime inputDate = DateTime.ParseExact(stringDate, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);

@@ -1,11 +1,12 @@
 using Gtk;
 
+//Клас форми, що відображає всі таблиці бази даних та даї змогу взаємодіяти з ними
 public partial class MainForm : Gtk.Window
 {
-    public string[] ColumnNames { get; private set; }
-
     private readonly Builder builder = new();
     readonly Window win;
+    
+    //Конструктор MainForm
     public MainForm() : base(Gtk.WindowType.Toplevel)
     {
         builder.AddFromFile("./forms/Forms.glade");
@@ -24,12 +25,12 @@ public partial class MainForm : Gtk.Window
             }
 
             tableNameBox.Active = 0;
-            
+
             win.Show();
         }
         else { Console.WriteLine("Your database is empty and there is no tables"); Application.Quit(); }
     }
-
+    //Заповнює мітки на формі
     private void fillLabel()
     {
         var adminInfoLabel = (Label)builder.GetObject("adminInfo");
@@ -37,7 +38,7 @@ public partial class MainForm : Gtk.Window
 
         adminInfoLabel.Text = "Info about you:\n" + Program.connection.GetAdminInfo(adminRow[0]);
     }
-
+    //Ініціалізує обробники подій
     private void InitTriggers()
     {
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
@@ -54,7 +55,7 @@ public partial class MainForm : Gtk.Window
         insertB.Clicked += tableNameText_changed_cb;
         exitB.Clicked += OnExitClicked;
     }
-
+    //Оброблює подію натискання на вставку нового рядка
     private void OnInsertClicked(object sender, System.EventArgs args)
     {
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
@@ -66,12 +67,12 @@ public partial class MainForm : Gtk.Window
             _ = new MessageBox("Insert successful!");
         else _ = new MessageBox("Insert unsuccessful :("); ;
     }
-
+    //Обробляє подію натискання кнопки виходу
     private void OnExitClicked(object sender, System.EventArgs args)
     {
         Application.Quit();
     }
-
+    // Обробляє подію активації рядка таблиці
     private void OnRowActivated(object sender, RowActivatedArgs args)
     {
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
@@ -113,6 +114,7 @@ public partial class MainForm : Gtk.Window
                 return;
         }
     }
+    //Тригер на змінення обраної таблиці для відображення та взаємодії
     protected void tableNameText_changed_cb(object sender, EventArgs e)
     {
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
@@ -142,6 +144,7 @@ public partial class MainForm : Gtk.Window
 
         table.Model = ts;
     }
+    //Генерація маленького діалового вікна, що запитує користувача щось і повертає одну з двух відповідей 
     static string AskUser(string question, string option1, string option2)
     {
         var dialog = new Gtk.MessageDialog(
@@ -164,6 +167,7 @@ public partial class MainForm : Gtk.Window
             return option2;
         else return null;
     }
+    // Повертає індекс колонки за назвою
     static private int GetColumnIndex(TreeView table, string tittle)
     {
         for (int i = 0; i < table.Columns.Length; i++)
