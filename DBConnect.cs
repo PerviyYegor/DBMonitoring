@@ -232,7 +232,7 @@ public class DBConnect
 
         using (var cmd = new MySqlCommand($"SELECT * FROM `{tableName}` WHERE `{columnName}`=@Value;", connection))
         {
-            cmd.Parameters.AddWithValue("@Value", value); // Використовуємо параметри для уникнення SQL ін'єкцій
+            cmd.Parameters.AddWithValue("@Value", value);
 
             using (var reader = cmd.ExecuteReader())
             {
@@ -287,10 +287,11 @@ public class DBConnect
         try
         {
             string updStr = "";
-            for (int i = 0; i < updateColNames.Length; i++){
-                var newValue = updateValues[i]==""?"@valueNull":updateValues[i]=$"'{updateValues[i]}'";
+            for (int i = 0; i < updateColNames.Length; i++)
+            {
+                var newValue = updateValues[i] == "" ? "@valueNull" : updateValues[i] = $"'{updateValues[i]}'";
                 updStr += updateColNames[i] + $"={newValue}, ";
-                }
+            }
             updStr = updStr[..^2];
 
             string query = $"UPDATE {tableName} SET {updStr} WHERE {columnName}='{value}'";
@@ -313,8 +314,8 @@ public class DBConnect
         {
             string query = $"UPDATE {tableName} SET {updateColName}= @value WHERE {columnName}='{value}'";
             var cmd = new MySqlCommand(query, connection);
-            if(updateValue==null|| updateValue=="")
-            cmd.Parameters.AddWithValue("@value", DBNull.Value);
+            if (updateValue == null || updateValue == "")
+                cmd.Parameters.AddWithValue("@value", DBNull.Value);
             else cmd.Parameters.AddWithValue("@value", updateValue);
             cmd.ExecuteNonQuery();
             return true;
@@ -340,6 +341,25 @@ public class DBConnect
                 return false;
             }
         }
+    }
+
+    public string GetCourierInfo(string courierID)
+    {
+        var courierEmpID = Program.connection.GetRow("Couriers", "idCourier", courierID)[1];
+        return $"Courier ID:{courierEmpID}\nCourier {GetEmployeeInfo(courierEmpID)}";
+    }
+
+    public string GetAdminInfo(string adminID)
+    {
+        var adminEmpID = Program.connection.GetRow("Admins", "idAdmin", adminID)[1];
+        return $"Admin ID:{adminEmpID}\nAdmin {GetEmployeeInfo(adminEmpID)}";
+    }
+
+    public string GetEmployeeInfo(string employeeID)
+    {
+
+        var empInfoRow = GetRow("Employees", "idEmployee", employeeID);
+        return $"Employee ID:{empInfoRow[0]}\n{empInfoRow[1]} {empInfoRow[2]}\nPhone:{empInfoRow[4]}";
     }
 
     private static string ConvertDateFormat(string stringDate)

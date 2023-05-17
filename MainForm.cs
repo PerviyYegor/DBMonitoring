@@ -13,19 +13,29 @@ public partial class MainForm : Gtk.Window
         win = (Window)builder.GetObject("MainWindow");
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
         InitTriggers();
+        fillLabel();
 
         if (Program.connection.GetTableNames().Length != 0)
         {
-            foreach (var t in Program.connection.GetTableNames()){
-                if(!Program.connection.isTableView(t))
-                tableNameBox.AppendText(t);
+            foreach (var t in Program.connection.GetTableNames())
+            {
+                if (!Program.connection.isTableView(t))
+                    tableNameBox.AppendText(t);
             }
 
             tableNameBox.Active = 0;
-
+            
             win.Show();
         }
-        else {Console.WriteLine("Your database is empty and there is no tables"); Application.Quit();}
+        else { Console.WriteLine("Your database is empty and there is no tables"); Application.Quit(); }
+    }
+
+    private void fillLabel()
+    {
+        var adminInfoLabel = (Label)builder.GetObject("adminInfo");
+        var adminRow = Program.connection.GetRow("Admins", "idEmployee", Program.idEmployeeConnection);
+
+        adminInfoLabel.Text = "Info about you:\n" + Program.connection.GetAdminInfo(adminRow[0]);
     }
 
     private void InitTriggers()

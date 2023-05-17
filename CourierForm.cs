@@ -12,10 +12,21 @@ public partial class CourierForm : Gtk.Window
         builder.AddFromFile("./forms/Forms.glade");
 
         win = (Window)builder.GetObject("CourierWindow");
-        loadView(viewName);
-
+        LoadView(viewName);
+        fillLabels();
         InitTriggers();
         win.Show();
+    }
+
+
+    private void fillLabels()
+    {
+        var courierInfoLabel = (Label)builder.GetObject("courierInfoLabel");
+        var adminInfoLabel = (Label)builder.GetObject("AdminOfCourierInfo");
+        var courierRow = Program.connection.GetRow("Couriers", "idEmployee", Program.idEmployeeConnection);
+       
+        adminInfoLabel.Text = "Info about you:\n"+Program.connection.GetAdminInfo(courierRow[2]);
+        courierInfoLabel.Text = "Info about your admin:\n"+Program.connection.GetCourierInfo(courierRow[0]);
     }
 
     private void InitTriggers()
@@ -32,7 +43,6 @@ public partial class CourierForm : Gtk.Window
     {
         Application.Quit();
     }
-
     private void OnRowActivated(object sender, RowActivatedArgs args)
     {
         var table = (TreeView)builder.GetObject("tableTextC");
@@ -59,15 +69,15 @@ public partial class CourierForm : Gtk.Window
                      new String[] { "DeliveryActuality", "idCourier" }, new String[] { "1", "" });
                                 break;
                             case "Delivery done!":
-                            Program.connection.UpdateRow("Orders", prKeyName, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyName)),
-                     "deliveryEnd", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                     
+                                Program.connection.UpdateRow("Orders", prKeyName, (string)model.GetValue(iter1, GetColumnIndex(table, prKeyName)),
+                         "deliveryEnd", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
 
                                 break;
                         }
 
 
-                        loadView(viewName);
+                        LoadView(viewName);
                     }
                     else _ = new MessageBox("Something went wrong :( \n Contact with your admin");
 
@@ -76,9 +86,9 @@ public partial class CourierForm : Gtk.Window
                 default:
                     return;
             }
-            loadView(viewName);
+        LoadView(viewName);
     }
-    protected void loadView(string viewName)
+    protected void LoadView(string viewName)
     {
         var table = (TreeView)builder.GetObject("tableTextC");
 
