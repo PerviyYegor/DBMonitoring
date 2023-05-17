@@ -10,19 +10,34 @@ class Program
 
     static void Main()
     {
-        ConnectWithConfigFile("./credentials/courier.txt");
+        ConnectWithConfigFile("./credentials/DBConnectData.txt");
+        UserEnter();
+
+        /*   ConnectWithConfigFile("./credentials/courier.txt");
         Application.Init();
         _ = new CourierForm();
         Application.Run();
-        
-        /* ConnectWithConfigFile("./credentials/admin.txt");
+         */
+
         Application.Init();
         var MF = new MainForm();
-        Application.Run(); */
+        Application.Run();
         
 
         connection.CloseConnection();
         Environment.Exit(0);
+    }
+
+    static bool UserEnter(){
+        Application.Init();
+
+        var LF = new LoginForm();
+        Application.Run();
+
+        foreach(var st in connection.GetRow("Passwords","login_", LF.login))
+        Console.WriteLine(st);
+
+        return true;
     }
 
     static DBConnect ConnectWithForm()
@@ -59,7 +74,7 @@ class Program
         }
         else
         {
-            _ = new MessageBox("Something went wrong. Maybe some data was written wrong!");
+            _ = new MessageBox("Something went wrong. Maybe some data was written wrong or file doesn't exist!");
             Environment.Exit(1);
         }
         connection = new DBConnect(pathToJsonFile);
