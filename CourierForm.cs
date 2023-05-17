@@ -25,8 +25,8 @@ public partial class CourierForm : Gtk.Window
         var adminInfoLabel = (Label)builder.GetObject("AdminOfCourierInfo");
         var courierRow = Program.connection.GetRow("Couriers", "idEmployee", Program.idEmployeeConnection);
        
-        adminInfoLabel.Text = "Info about you:\n"+Program.connection.GetAdminInfo(courierRow[2]);
-        courierInfoLabel.Text = "Info about your admin:\n"+Program.connection.GetCourierInfo(courierRow[0]);
+        adminInfoLabel.Text = "Info about you:\n"+Program.connection.GetCourierInfo(courierRow[0]);
+        courierInfoLabel.Text = "Info about your admin:\n"+Program.connection.GetAdminInfo(courierRow[2]);
     }
 
     private void InitTriggers()
