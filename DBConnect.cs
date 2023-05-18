@@ -1,16 +1,15 @@
 ﻿using System.Data;
 using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
-using System;
 
 
 //Клас, що містить дані та методи для їх отримання задля підключення до БД
 public class ConnectionData
 {
-    public string Host { get; private set; }//адреса підключення до БД
-    public string DbName { get; private set; }//ім'я БД
-    public string UserName { get; private set; }//ім'я користувача до якого приєднується підключення до БД
-    public string Password { get; private set; }//пароль користувача до якого приєднується підключення до БД
+    public string Host { get; private set; }//Адреса підключення до БД
+    public string DbName { get; private set; }//Ім'я БД
+    public string UserName { get; private set; }//Ім'я користувача до якого приєднується підключення до БД
+    public string Password { get; private set; }//Пароль користувача до якого приєднується підключення до БД
 
     //Конструктор класу ConnectionData, якому подаються всі поля для підключення
     public ConnectionData(string server_, string database_, string uid_, string password_)

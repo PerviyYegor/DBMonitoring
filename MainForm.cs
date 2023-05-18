@@ -47,12 +47,12 @@ public partial class MainForm : Gtk.Window
         var insertB = (Button)builder.GetObject("insertButton");
         var exitB = (Button)builder.GetObject("exitButton");
 
-        tableNameBox.Changed += tableNameText_changed_cb;
+        tableNameBox.Changed += TableNameText_changed_cb;
         table.RowActivated += OnRowActivated;
-        table.RowActivated += tableNameText_changed_cb;
-        reloadB.Clicked += tableNameText_changed_cb;
+        table.RowActivated += TableNameText_changed_cb;
+        reloadB.Clicked += TableNameText_changed_cb;
         insertB.Clicked += OnInsertClicked;
-        insertB.Clicked += tableNameText_changed_cb;
+        insertB.Clicked += TableNameText_changed_cb;
         exitB.Clicked += OnExitClicked;
     }
     //Оброблює подію натискання на вставку нового рядка
@@ -72,14 +72,13 @@ public partial class MainForm : Gtk.Window
     {
         Application.Quit();
     }
-    // Обробляє подію активації рядка таблиці
+    //Обробляє подію активації рядка таблиці
     private void OnRowActivated(object sender, RowActivatedArgs args)
     {
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
         var table = (TreeView)builder.GetObject("tableText");
 
         TreePath path = args.Path;
-        int index = path.Indices[0];
 
         ITreeModel model = ((TreeView)sender).Model;
 
@@ -115,7 +114,7 @@ public partial class MainForm : Gtk.Window
         }
     }
     //Тригер на змінення обраної таблиці для відображення та взаємодії
-    protected void tableNameText_changed_cb(object sender, EventArgs e)
+    protected void TableNameText_changed_cb(object sender, EventArgs e)
     {
         var tableNameBox = (ComboBoxText)builder.GetObject("tableNameText");
         var table = (TreeView)builder.GetObject("tableText");
@@ -167,7 +166,7 @@ public partial class MainForm : Gtk.Window
             return option2;
         else return null;
     }
-    // Повертає індекс колонки за назвою
+    //Повертає індекс колонки за назвою
     static private int GetColumnIndex(TreeView table, string tittle)
     {
         for (int i = 0; i < table.Columns.Length; i++)

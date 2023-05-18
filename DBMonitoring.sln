@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "manufactureDB", "manufactureDB.csproj", "{D55C8298-B094-4AE9-85B4-105940768565}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBMonitoring", "DBMonitoring.csproj", "{D55C8298-B094-4AE9-85B4-105940768565}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

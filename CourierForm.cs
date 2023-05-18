@@ -4,7 +4,7 @@ using Gtk;
 public partial class CourierForm : Gtk.Window
 {
     private readonly Builder builder = new();
-    private readonly string viewName = "CourierView";
+    private readonly string viewName = "CourierView"; //Назва вигляду, що відображає дані про замовлення, яку потрібно знати кур’єру
     readonly Window win;
 
     //Конструктор класу форми CourierForm
@@ -14,13 +14,13 @@ public partial class CourierForm : Gtk.Window
 
         win = (Window)builder.GetObject("CourierWindow");
         LoadView(viewName);
-        fillLabels();
+        FillLabels();
         InitTriggers();
         win.Show();
     }
 
     //Заповнює мітки на формі
-    private void fillLabels()
+    private void FillLabels()
     {
         var courierInfoLabel = (Label)builder.GetObject("courierInfoLabel");
         var adminInfoLabel = (Label)builder.GetObject("AdminOfCourierInfo");

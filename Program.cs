@@ -1,11 +1,12 @@
+using System;
 using Gtk;
 
 //Клас, що ініціалізує програму та викликає потрібні блоки
 class Program
 {
-    public static DBConnect connection; //поле, що містить посилання на поточне підключення до БД
+    public static DBConnect connection; //Поле, що містить посилання на поточне підключення до БД
     public static string idEmployeeConnection; //ID аутентифікованого працівника
-    public static bool isUserAdmin;//поле, що містить інформацію чи аутентифікований працівник є адміністратором
+    public static bool isUserAdmin;//Поле, що містить інформацію чи аутентифікований працівник є адміністратором
 
     //Метод, що ініціалізує програму та викликає потрібні блоки
     static void Main()
@@ -81,11 +82,11 @@ class Program
         return connection;
     }
     //Блок, що здійснює підключення через конфігураційний файл
-    static DBConnect ConnectWithConfigFile(string pathToJsonFile)
+    static DBConnect ConnectWithConfigFile(string pathToTxtFile)
     {
         Application.Init();
-        _ = new MessageBox($"Trying connect to DB with info from here: {pathToJsonFile}");
-        connection = new DBConnect(pathToJsonFile);
+        _ = new MessageBox($"Trying connect to DB with info from here: {pathToTxtFile}");
+        connection = new DBConnect(pathToTxtFile);
         if (connection.OpenConnection())
         {
             _ = new MessageBox("Connection successful!");
@@ -95,7 +96,7 @@ class Program
             _ = new MessageBox("Something went wrong. Maybe some data was written wrong or file doesn't exist!");
             Environment.Exit(1);
         }
-        connection = new DBConnect(pathToJsonFile);
+        connection = new DBConnect(pathToTxtFile);
         connection.OpenConnection();
         return connection;
     }
